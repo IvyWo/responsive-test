@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamic Cockpit Panel Mockup</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #F8FAFF;
+  --surface: #FFFFFF;
+  --surface2: #EFF1FB;
+  --border: #F3F4F9;
+  --brand: #1736F5;
+  --brand-container: #EFF4FF;
+  --typo-navy: #111827;
+  --muted: #9CA3AF;
+  --red: #E11D48;
+  --green: #16A34A;
+}
+
+body {
+  font-family: 'Urbanist', sans-serif;
+  background: var(--bg);
+  color: var(--typo-navy);
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── HEADER FILTER ROW ── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 16px;
+  gap: 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.flt-btn {
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--typo-navy);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Minimalist toggle button matching description */
+.btn-ask-genie-toggle {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-ask-genie-toggle:hover {
+  background: var(--brand-container);
+}
+
+.btn-ask-genie-toggle.active {
+  background: var(--brand);
+  color: #FFFFFF;
+}
+
+/* ── DYNAMIC 2-TO-3 COLUMN ENGINE ── */
+.cockpit {
+  display: grid;
+  /* State 1: Default 2-column view */
+  grid-template-columns: 1fr 340px;
+  height: calc(100vh - 56px);
+  padding: 12px;
+  gap: 12px;
+  transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* State 2: Active expanded 3-column push view */
+.cockpit.ask-genie-open {
+  grid-template-columns: 1fr 280px 340px;
+}
+
+/* ── COLUMN 1: MAIN DATA TILES ── */
+.main-data-region {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  min-width: 0;
+}
+
+.kpi-grid-shim {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.card-shim {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.plots-side-by-side-shim {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+/* ── COLUMN 2: INSIGHTS SIDEBAR ── */
+.insights-sidebar-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.insight-block-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  height: auto; /* Fits contents natively */
+}
+
+.insight-header {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--typo-navy);
+  margin-bottom: 8px;
+}
+
+.insight-header.risk-title { color: var(--red); }
+.insight-header.opp-title { color: var(--green); }
+
+.insight-item-text {
+  font-size: 12px;
+  color: var(--typo-navy);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.btn-ghost-history {
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-top: 4px;
+}
+
+.btn-ghost-history:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+/* ── COLUMN 3: STATIONARY DRAWER PANEL ── */
+.ask-panel-drawer {
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  /* Hidden natively in State 1 via CSS track collapse */
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.2s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.cockpit.ask-genie-open .ask-panel-drawer {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.chat-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chat-clear-btn:hover { color: var(--brand); }
+
+.chat-feed {
+  flex: 1;
+  padding: 16px;
+  background: var(--bg);
+  overflow-y: auto;
+  font-size: 12px;
+}
+
+.chat-input-container {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.chat-field-mock {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg);
+  font-size: 12px;
+  outline: none;
+}
+</style>
+</head>
+<body>
+
+  <!-- FILTER STRIP ROW -->
+  <div class="filter-bar">
+    <button class="flt-btn">📍 Location: All (80)</button>
+    <button class="flt-btn">📅 Period: 17 May – 15 Jun 2026 vs 17 Apr – 16 May 2026</button>
+    
+    <!-- Minimalist Toggle Button -->
+    <button class="btn-ask-genie-toggle" id="genieToggle" onclick="toggleGenieTrack()">
+      <span>✦ Ask Genie</span>
+    </button>
+  </div>
+
+  <!-- APPLICATION WORKSPACE -->
+  <main class="cockpit" id="cockpitWorkspace">
+    
+    <!-- TRACK 1: PRIMARY GRID METRICS -->
+    <div class="main-data-region">
+      <div class="kpi-grid-shim">
+        <div class="card-shim">Net Sales<br><span style="color:var(--brand); font-size:18px">RM 2.45M</span></div>
+        <div class="card-shim">Bill Size<br><span style="color:var(--brand); font-size:18px">RM 35.20</span></div>
+        <div class="card-shim">Gross Margin<br><span style="color:var(--green); font-size:18px">68.2%</span></div>
+        <div class="card-shim">EBITDA<br><span style="color:var(--brand); font-size:18px">RM 124.5k</span></div>
+      </div>
+      <div class="plots-side-by-side-shim">
+        [ Fluid Operational Analytics Chart Space ]
+      </div>
+    </div>
+
+    <!-- TRACK 2: INSIGHTS SIDEBAR PANEL -->
+    <div class="insights-sidebar-rail">
+      <!-- Top risks Section -->
+      <div class="insight-block-card">
+        <div class="insight-header risk-title">Top risks</div>
+        <div class="insight-item-text">⚠️ Kajang outlet shut down 2-4 PM</div>
+        <div class="insight-item-text">⚠️ High system override frequency at Bangsar</div>
+      </div>
+      
+      <!-- Opportunities Section -->
+      <div class="insight-block-card">
+        <div class="insight-header opp-title">Opportunities</div>
+        <div class="insight-item-text">💡 Weekday lunch combo push across 23 units</div>
+        <div class="insight-item-text">💡 Reactivate 1,200 silver tier members</div>
+        <button class="btn-ghost-history">View insight history</button>
+      </div>
+    </div>
+
+    <!-- TRACK 3: STATIONARY GENIE CONVERSATION VIEW -->
+    <div class="ask-panel-drawer">
+      <div class="chat-header">
+        <span>✦ Ask Genie</span>
+        <button class="chat-clear-btn" onclick="toggleGenieTrack()">[ Close ]</button>
+      </div>
+      <div class="chat-feed">
+        <div style="background: var(--surface2); padding: 8px; border-radius: 8px; margin-bottom: 8px; max-width: 85%;">
+          Hi! Ask me anything about outlet metrics, revenue streams, or trends.
+        </div>
+      </div>
+      <div class="chat-input-container">
+        <input class="chat-field-mock" type="text" placeholder="Type your query here..." readonly>
+      </div>
+    </div>
+
+  </main>
+
+<script>
+function toggleGenieTrack() {
+  const cockpit = document.getElementById('cockpitWorkspace');
+  const toggleBtn = document.getElementById('genieToggle');
+  
+  // Toggles the dynamic layout shift
+  cockpit.classList.toggle('ask-genie-open');
+  toggleBtn.classList.toggle('active');
+}
+</script>
+</body>
+</html>
